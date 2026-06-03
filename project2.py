@@ -1,48 +1,56 @@
 from flask import Flask
 
-app = Flask(_name_)
+app = Flask(__name__)
 
-# Product data (list of dictionaries)
-products = [
-    {"id": 101, "name": "Laptop", "price": 45000},
-    {"id": 102, "name": "Mobile", "price": 18000},
-    {"id": 103, "name": "Headphones", "price": 2000}
+# List of dictionaries (Voting Records)
+voters = [
+    {"id": 101, "name": "kartik sharma", "age": 22, "city": "Nanded", "voted": "Yes"},
+    {"id": 102, "name": "ajay shukla", "age": 19, "city": "pune", "voted": "No"},
+    {"id": 103, "name": "yogesh more", "age": 20, "city": "nanded", "voted": "Yes"},
+    {"id": 104, "name": "yash rajput", "age": 19, "city": "paithan", "voted": "Yes"},
+    {"id": 105, "name": "sunita patil", "age": 18, "city": "pune", "voted": "No"}
 ]
 
-# Route 1 - Home Page
-@app.route('/')
+# Route 1 - Homepage
+@app.route("/")
 def home():
     return """
-    <h1>Online Store Project</h1>
-    <p>Welcome to our Flask-based Online Store Application.</p>
+    <h1>ONLINE VOTING SYSTEM</h1>
+    <p>This project is used for online voting and voter record management.</p>
     """
 
-# Route 2 - Products Page
-@app.route('/products')
-def products_page():
-    result = "<h2>Available Products</h2><ul>"
-
-    for product in products:
-        result += f"""
-        <li>
-        Product ID: {product['id']} |
-        Name: {product['name']} |
-        Price: ₹{product['price']}
-        </li>
+# Route 2 - Records Page
+@app.route("/records")
+def records():
+    output = "<h2>Voter Records</h2>"
+    
+    for voter in voters:
+        output += f"""
+        <p>
+        ID: {voter['id']} <br>
+        Name: {voter['name']} <br>
+        City: {voter['city']} <br>
+        Voted: {voter['voted']}
+        </p>
+        <hr>
         """
+    return output
 
-    result += "</ul>"
-    return result
-
-# Route 3 - Contact Page
-@app.route('/contact')
-def contact():
-    return """
-    <h2>Contact Us</h2>
-    <p>Email: store@gmail.com</p>
-    <p>Phone: +91 9876543210</p>
+# Route 3 - Voting Status
+@app.route("/status")
+def status():
+    total_voters = len(voters)
+    voted_count = 0
+    
+    for voter in voters:
+        if voter["voted"] == "Yes":
+            voted_count += 1
+            
+    return f"""
+    <h2>Voting Status</h2>
+    Total Voters: {total_voters}<br>
+    Votes Cast: {voted_count}
     """
 
-# Run the Flask App
-if _name_ == '_main_':
+if __name__ == "__main__":
     app.run(debug=True)
