@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">About This Project</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Project:</b> {{ project_name }} <span class="badge bg-success">v1.0</span></li>
+                    <li class="list-group-item"><b>Technology:</b> Python Flask Framework + Bootstrap 5</li>
+                    <li class="list-group-item"><b>Purpose:</b> Learn routing, templates, and data rendering in Flask</li>
+                    <li class="list-group-item"><b>Features:</b> 
+                        <span class="badge bg-info">4 Routes</span>
+                        <span class="badge bg-info">Jinja2 Templates</span>
+                        <span class="badge bg-info">Bootstrap UI</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
