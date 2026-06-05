@@ -11,8 +11,8 @@ def show_details(name, roll, mark, att):
     print("Marks:", mark)
     print("Attendance:", att)
 
-user_roll = int(input("Roll No: ")) # Fix 1: convert to int
-user_pass = int(input("Password: ")) # Fix 2: convert to int
+user_roll = int(input("Roll No: ")) 
+user_pass = int(input("Password: "))     
 
 for i in range(len(students)):
     if rolls[i] == user_roll and passwords[i] == user_pass:
@@ -20,7 +20,7 @@ for i in range(len(students)):
         show_details(students[i], rolls[i], marks[i], attendance[i])
         print("Notice Board:")
         for notice in notices:
-            print("-", notice)
+            print(" ", notice)
         break
 else:
     print("Invalid Login")

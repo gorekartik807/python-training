@@ -1,7 +1,41 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h1>Welcome to {{ project_name }}</h1>
-<p>This is Flask Assignment Project.</p>
-<p><a href="{{ url_for('records') }}">View Student Records</a></p>
+<div class="row">
+    <div class="col-md-12 text-center mb-4">
+        <h1 class="display-4">Welcome to {{ project_name }}</h1>
+        <p class="lead"><b>Description:</b> This is a Flask web application for managing student records.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">View Records <span class="badge bg-success">New</span></h5>
+                <p class="card-text">Check all student data with marks and details.</p>
+                <a href="{{ url_for('records') }}" class="btn btn-primary">Go to Records</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">About Project <span class="badge bg-info">Info</span></h5>
+                <p class="card-text">Learn about technology stack and purpose.</p>
+                <a href="{{ url_for('about') }}" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Student Login <span class="badge bg-warning text-dark">Beta</span></h5>
+                <p class="card-text">Login portal for students and faculty.</p>
+                <a href="{{ url_for('login') }}" class="btn btn-dark">Login Now</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
