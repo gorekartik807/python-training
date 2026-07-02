@@ -1,24 +1,178 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h2 class="mb-0">About This Project</h2>
-            </div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><b>Project:</b> {{ project_name }} <span class="badge bg-success">v1.0</span></li>
-                    <li class="list-group-item"><b>Technology:</b> Python Flask Framework + Bootstrap 5</li>
-                    <li class="list-group-item"><b>Purpose:</b> Learn routing, templates, and data rendering in Flask</li>
-                    <li class="list-group-item"><b>Features:</b> 
-                        <span class="badge bg-info">4 Routes</span>
-                        <span class="badge bg-info">Jinja2 Templates</span>
-                        <span class="badge bg-info">Bootstrap UI</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 50px 30px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+    .hero-section h1 {
+        font-size: 42px;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+    .hero-section p {
+        font-size: 18px;
+        opacity: 0.95;
+    }
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+    .feature-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+        border-left: 4px solid #667eea;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    .feature-icon {
+        font-size: 40px;
+        margin-bottom: 15px;
+    }
+    .feature-card h3 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+    .feature-card p {
+        color: #7f8c8d;
+        line-height: 1.6;
+    }
+    .tech-stack {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+    .tech-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        margin: 5px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .stats-section {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 20px;
+        text-align: center;
+        margin: 40px 0;
+    }
+    .stat-box {
+        flex: 1;
+        min-width: 150px;
+    }
+    .stat-number {
+        font-size: 36px;
+        font-weight: 700;
+        color: #667eea;
+    }
+    .stat-label {
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="hero-section">
+    <h1>🎓 StudentMS</h1>
+    <p>A Modern Student Management System Built with Flask & SQLite</p>
+</div>
+
+<div class="stats-section">
+    <div class="stat-box">
+        <div class="stat-number">2</div>
+        <div class="stat-label">User Roles</div>
     </div>
+    <div class="stat-box">
+        <div class="stat-number">8+</div>
+        <div class="stat-label">Key Features</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Responsive</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-number">SQL</div>
+        <div class="stat-label">JOIN Queries</div>
+    </div>
+</div>
+
+<h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">✨ Core Features</h2>
+<div class="features-grid">
+    <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <h3>Role-Based Access</h3>
+        <p>Secure login system with Admin & Student roles. Admins can manage everything, students have view-only access.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Smart Dashboard</h3>
+        <p>Real-time statistics showing total students, pass/fail ratio, and low attendance alerts at a glance.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <h3>Subject Management</h3>
+        <p>Organize students by subjects using SQL JOIN queries. Track marks, attendance per subject.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Advanced Search</h3>
+        <p>Live search with debouncing. Filter students by name, roll number, or subject instantly.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">📥</div>
+        <h3>Export to CSV</h3>
+        <p>Download complete student reports with one click. Perfect for backups and analysis.</p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Fully Responsive</h3>
+        <p>Works seamlessly on desktop, tablet, and mobile. Modern UI with smooth animations.</p>
+    </div>
+</div>
+
+<div class="tech-stack">
+    <h2 style="text-align: center; margin-bottom: 25px; color: #2c3e50;">🛠️ Technology Stack</h2>
+    <div style="text-align: center;">
+        <span class="tech-badge">Python 3.x</span>
+        <span class="tech-badge">Flask</span>
+        <span class="tech-badge">SQLite3</span>
+        <span class="tech-badge">Jinja2</span>
+        <span class="tech-badge">HTML5</span>
+        <span class="tech-badge">CSS3</span>
+        <span class="tech-badge">JavaScript</span>
+        <span class="tech-badge">SQL JOIN</span>
+    </div>
+</div>
+
+<div class="card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; text-align: center; padding: 40px;">
+    <h2 style="margin-bottom: 15px;">👨‍💻 Developer Info</h2>
+    <p style="font-size: 18px; margin-bottom: 10px;"><strong>Built by:</strong> Kartik Gore</p>
+    <p style="font-size: 16px; opacity: 0.9;"> ITR Project | 2026</p>
+    <p style="margin-top: 20px; font-size: 14px; opacity: 0.8;">
+        This project demonstrates CRUD operations, SQL relationships, authentication, 
+        and responsive web design using Flask framework.
+    </p>
 </div>
 {% endblock %}

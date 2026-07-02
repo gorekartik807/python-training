@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2>Add New Student</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>Student Name *</label>
+            <input type="text" name="name" required>
+        </div>
+        <div class="form-group">
+            <label>Roll Number *</label>
+            <input type="text" name="roll_no" required>
+        </div>
+        <div class="form-group">
+            <label>Subject *</label>
+            <select name="subject_id" required>
+                <option value="">Select Subject</option>
+                {% for sub in subjects %}
+                    <option value="{{ sub.id }}">{{ sub.subject_name }} ({{ sub.subject_code }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Marks (0-100) *</label>
+            <input type="number" name="marks" min="0" max="100" required>
+        </div>
+        <div class="form-group">
+            <label>Attendance % (0-100) *</label>
+            <input type="number" name="attendance" min="0" max="100" required>
+        </div>
+        <button type="submit" class="btn btn-success">Add Student</button>
+        <a href="/records" class="btn btn-danger">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width: 700px; margin: 0 auto;">
+    <h2>Student Details</h2>
+    <table style="margin-top: 20px;">
+        <tr>
+            <th style="width: 150px;">Name:</th>
+            <td><strong>{{ student.name }}</strong></td>
+        </tr>
+        <tr>
+            <th>Roll Number:</th>
+            <td>{{ student.roll_no }}</td>
+        </tr>
+        <tr>
+            <th>Subject:</th>
+            <td>{{ student.subject_name }} ({{ student.subject_code }})</td>
+        </tr>
+        <tr>
+            <th>Teacher:</th>
+            <td>{{ student.teacher_name or 'N/A' }}</td>
+        </tr>
+        <tr>
+            <th>Marks:</th>
+            <td>{{ student.marks }}/100</td>
+        </tr>
+        <tr>
+            <th>Attendance:</th>
+            <td>{{ student.attendance }}%</td>
+        </tr>
+        <tr>
+            <th>Status:</th>
+            <td>
+                {% if student.marks >= 40 %}
+                    <span style="color: green; font-weight: bold; font-size: 18px;">PASS ✓</span>
+                {% else %}
+                    <span style="color: red; font-weight: bold; font-size: 18px;">FAIL ✗</span>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    <div style="margin-top: 25px;">
+        <a href="/records" class="btn btn-primary">← Back to Records</a>
+        {% if session.role == 'admin' %}
+            <a href="/edit/{{ student.id }}" class="btn btn-warning">Edit</a>
+            <a href="/delete/{{ student.id }}" class="btn btn-danger" onclick="return confirm('Delete this student?')">Delete</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

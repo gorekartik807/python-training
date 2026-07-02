@@ -1,41 +1,109 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
-<div class="row">
-    <div class="col-md-12 text-center mb-4">
-        <h1 class="display-4">Welcome to {{ project_name }}</h1>
-        <p class="lead"><b>Description:</b> This is a Flask web application for managing student records.</p>
-    </div>
-</div>
+<style>
+   .dashboard-card {
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+   .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .quick-action-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s;
+        text-align: center;
+    }
+    .quick-action-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+</style>
 
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">View Records <span class="badge bg-success">New</span></h5>
-                <p class="card-text">Check all student data with marks and details.</p>
-                <a href="{{ url_for('records') }}" class="btn btn-primary">Go to Records</a>
+<div class="card">
+    <h2>Dashboard</h2>
+    
+    <!-- Top 4 Stat Cards - Ab Clickable Hai -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 25px;">
+        <a href="/records" style="text-decoration: none;">
+            <div class="dashboard-card" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 30px; border-radius: 12px;">
+                <div style="font-size: 48px; font-weight: 700;">{{ total }}</div>
+                <div style="font-size: 16px; margin-top: 8px; opacity: 0.95;">Total Students</div>
             </div>
+        </a>
+        
+        <a href="/records?status=passed" style="text-decoration: none;">
+            <div class="dashboard-card" style="background: linear-gradient(135deg, #11998e, #38ef7d); color: white; padding: 30px; border-radius: 12px;">
+                <div style="font-size: 48px; font-weight: 700;">{{ passed }}</div>
+                <div style="font-size: 16px; margin-top: 8px; opacity: 0.95;">Passed</div>
+            </div>
+        </a>
+        
+        <a href="/records?status=failed" style="text-decoration: none;">
+            <div class="dashboard-card" style="background: linear-gradient(135deg, #eb3349, #f45c43); color: white; padding: 30px; border-radius: 12px;">
+                <div style="font-size: 48px; font-weight: 700;">{{ failed }}</div>
+                <div style="font-size: 16px; margin-top: 8px; opacity: 0.95;">Failed</div>
+            </div>
+        </a>
+        
+        <a href="/records?attendance=low" style="text-decoration: none;">
+            <div class="dashboard-card" style="background: linear-gradient(135deg, #c471f5, #fa71cd); color: white; padding: 30px; border-radius: 12px;">
+                <div style="font-size: 48px; font-weight: 700;">{{ low_attendance }}</div>
+                <div style="font-size: 16px; margin-top: 8px; opacity: 0.95;">Low Attendance</div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Welcome Box -->
+    <div style="margin-top: 40px; padding: 25px; background: #f8f9fa; border-radius: 12px;">
+        <h3>Welcome to StudentMS, {{ session.username }}! 👋</h3>
+        <p style="color: #666; margin-top: 10px;">This Student Management System helps you easily manage students, subjects, marks, and attendance.</p>
+    </div>
+
+    <!-- Neeche Wale Quick Action Squares - Wapas Add Kiye -->
+    <div style="margin-top: 30px;">
+        <h3 style="margin-bottom: 20px; color: #2c3e50;">⚡ Quick Actions</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            
+            {% if session.role == 'admin' %}
+            <a href="/add" style="text-decoration: none;">
+                <div class="quick-action-card">
+                    <div style="font-size: 40px; margin-bottom: 10px;">➕</div>
+                    <h4 style="color: #2c3e50; margin-bottom: 8px;">Add Student</h4>
+                    <p style="color: #7f8c8d; font-size: 14px;">Register a new student with marks and attendance</p>
+                </div>
+            </a>
+            
+            <a href="/add_subject" style="text-decoration: none;">
+                <div class="quick-action-card">
+                    <div style="font-size: 40px; margin-bottom: 10px;">📚</div>
+                    <h4 style="color: #2c3e50; margin-bottom: 8px;">Add Subject</h4>
+                    <p style="color: #7f8c8d; font-size: 14px;">Create new subjects and assign teachers</p>
+                </div>
+            </a>
+            {% endif %}
+            
+            <a href="/export" style="text-decoration: none;">
+                <div class="quick-action-card">
+                    <div style="font-size: 40px; margin-bottom: 10px;">📥</div>
+                    <h4 style="color: #2c3e50; margin-bottom: 8px;">Export Report</h4>
+                    <p style="color: #7f8c8d; font-size: 14px;">Download complete student data as CSV</p>
+                </div>
+            </a>
+            
+            <a href="/records" style="text-decoration: none;">
+                <div class="quick-action-card">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🔍</div>
+                    <h4 style="color: #2c3e50; margin-bottom: 8px;">Search Students</h4>
+                    <p style="color: #7f8c8d; font-size: 14px;">Find and filter students by name or roll no</p>
+                </div>
+            </a>
+            
         </div>
     </div>
     
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">About Project <span class="badge bg-info">Info</span></h5>
-                <p class="card-text">Learn about technology stack and purpose.</p>
-                <a href="{{ url_for('about') }}" class="btn btn-secondary">Learn More</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Student Login <span class="badge bg-warning text-dark">Beta</span></h5>
-                <p class="card-text">Login portal for students and faculty.</p>
-                <a href="{{ url_for('login') }}" class="btn btn-dark">Login Now</a>
-            </div>
-        </div>
-    </div>
 </div>
 {% endblock %}

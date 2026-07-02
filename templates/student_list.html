@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-3"><i class="fas fa-users text-primary"></i> {{ title }} <span class="badge bg-primary">{{ students|length }}</span></h2>
+
+<div class="row">
+  {% for student in students %}
+  <div class="col-md-6 col-lg-4 mb-3">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header {% if student.status == 'Pass' %}bg-success{% else %}bg-danger{% endif %} text-white">
+        <i class="fas fa-user-graduate"></i> <strong>{{ student.name }}</strong>
+      </div>
+      <div class="card-body">
+        <p class="mb-2"><i class="fas fa-hashtag text-secondary"></i> <strong>Roll:</strong> {{ student.roll }}</p>
+        <p class="mb-2"><i class="fas fa-book text-secondary"></i> <strong>Subject:</strong> <span class="badge bg-secondary">{{ student.subject }}</span></p>
+        <p class="mb-2"><i class="fas fa-star text-warning"></i> <strong>Marks:</strong> {{ student.marks }} 
+          {% set grade = get_grade(student.marks) %}
+          <span class="badge {% if grade == 'A+' %}bg-success{% elif grade == 'A' %}bg-primary{% else %}bg-info{% endif %}">{{ grade }}</span>
+        </p>
+        <p class="mb-2"><i class="fas fa-envelope text-primary"></i> <strong>Email:</strong> {{ student.email }}</p>
+        <p class="mb-3"><i class="fas fa-clipboard-check text-info"></i> <strong>Status:</strong> 
+          <span class="badge {% if student.status == 'Pass' %}bg-success{% else %}bg-danger{% endif %}">
+            <i class="fas {% if student.status == 'Pass' %}fa-check{% else %}fa-times{% endif %}"></i> {{ student.status }}
+          </span>
+        </p>
+        <a href="{{ url_for('view_student', id=student.id) }}" class="btn btn-sm btn-info w-100"><i class="fas fa-eye"></i> View Details</a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12">
+    <div class="alert alert-info shadow-sm"><i class="fas fa-info-circle"></i> No students found.</div>
+  </div>
+  {% endfor %}
+</div>
+
+<a href="{{ url_for('home') }}" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+{% endblock %}
