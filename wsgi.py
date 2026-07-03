@@ -1,11 +1,8 @@
 import sys
-import os
 
-# Project ka path add karo - ye change karna padega PythonAnywhere pe
-path = '/home/yourusername/StudentMS'
+# Apna username aur folder path daal
+path = '/home/kartik/python-training'  # ya /home/YourUsername/mysite
 if path not in sys.path:
-    sys.path.insert(0, path)
+    sys.path.append(path)
 
 from app import app as application
-
-# PythonAnywhere ko 'application' variable chahiye

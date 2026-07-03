@@ -12,6 +12,31 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+def init_db():
+    conn = get_db()
+    conn.execute('''CREATE TABLE IF NOT EXISTS users 
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                     username TEXT UNIQUE, 
+                     password TEXT, 
+                     role TEXT)''')
+    conn.execute('''CREATE TABLE IF NOT EXISTS subjects 
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                     subject_name TEXT, 
+                     subject_code TEXT UNIQUE, 
+                     teacher_name TEXT)''')
+    conn.execute('''CREATE TABLE IF NOT EXISTS students 
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                     name TEXT, 
+                     roll_no TEXT UNIQUE, 
+                     subject_id INTEGER, 
+                     marks INTEGER, 
+                     attendance INTEGER, 
+                     created_by INTEGER,
+                     FOREIGN KEY(subject_id) REFERENCES subjects(id),
+                     FOREIGN KEY(created_by) REFERENCES users(id))''')
+    conn.commit()
+    conn.close()
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -39,9 +64,14 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        role = request.form['role']
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        # Auto role: admin username pe admin, baaki sab student
+        if username.lower() == 'admin':
+            role = 'admin'
+        else:
+            role = 'student'
         
         conn = get_db()
         try:
@@ -80,7 +110,6 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    flash('Logged out successfully!', 'success')
     return redirect(url_for('login'))
 
 @app.route('/home')
@@ -104,8 +133,8 @@ def about():
 def records():
     search = request.args.get('search', '')
     subject_id = request.args.get('subject_id', '')
-    status = request.args.get('status', '') # passed ya failed
-    attendance = request.args.get('attendance', '') # low
+    status = request.args.get('status', '')
+    attendance = request.args.get('attendance', '')
     
     conn = get_db()
     subjects = conn.execute("SELECT * FROM subjects").fetchall()
@@ -126,7 +155,6 @@ def records():
         query += " AND s.subject_id =?"
         params.append(subject_id)
     
-    # Dashboard se aane wale filters
     if status == 'passed':
         query += " AND s.marks >= 40"
     elif status == 'failed':
@@ -138,7 +166,6 @@ def records():
     students = conn.execute(query, params).fetchall()
     conn.close()
     
-    # Filter ka title set karne ke liye
     filter_title = "All Students"
     if status == 'passed':
         filter_title = "Passed Students"
@@ -370,6 +397,9 @@ def export():
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment;filename=students_report.csv"}
     )
+
+# PythonAnywhere ke liye - tables auto create karne ke liye
+init_db()
 
 if __name__ == '__main__':
     app.run(debug=True)
