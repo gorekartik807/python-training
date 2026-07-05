@@ -31,7 +31,7 @@ def init_db():
                      subject_name TEXT,
                      subject_code TEXT UNIQUE,
                      teacher_name TEXT)''')
-    conn.execute('''CREATE TABLE IF NOT EXISTS students
+    conn.execute('''CREATE TABLE IF NOT EXISTS student
                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
                      name TEXT,
                      roll_no TEXT UNIQUE,
@@ -74,7 +74,6 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        # Auto role: admin username pe admin, baaki sab student
         if username.lower() == 'admin':
             role = 'admin'
         else:
@@ -123,10 +122,10 @@ def logout():
 @login_required
 def home():
     conn = get_db()
-    total = conn.execute("SELECT COUNT(*) FROM students").fetchone()[0]
-    passed = conn.execute("SELECT COUNT(*) FROM students WHERE marks >= 40").fetchone()[0]
-    failed = conn.execute("SELECT COUNT(*) FROM students WHERE marks < 40").fetchone()[0]
-    low_attendance = conn.execute("SELECT COUNT(*) FROM students WHERE attendance < 75").fetchone()[0]
+    total = conn.execute("SELECT COUNT(*) FROM student").fetchone()[0]
+    passed = conn.execute("SELECT COUNT(*) FROM student WHERE marks >= 40").fetchone()[0]
+    failed = conn.execute("SELECT COUNT(*) FROM student WHERE marks < 40").fetchone()[0]
+    low_attendance = conn.execute("SELECT COUNT(*) FROM student WHERE attendance < 75").fetchone()[0]
     conn.close()
     return render_template('home.html', total=total, passed=passed, failed=failed, low_attendance=low_attendance)
 
@@ -148,7 +147,7 @@ def records():
 
     query = """
         SELECT s.*, sub.subject_name
-        FROM students s
+        FROM student s
         JOIN subjects sub ON s.subject_id = sub.id
         WHERE 1=1
     """
@@ -199,7 +198,7 @@ def add():
 
         try:
             conn.execute("""
-                INSERT INTO students (name, roll_no, subject_id, marks, attendance, created_by)
+                INSERT INTO student (name, roll_no, subject_id, marks, attendance, created_by)
                 VALUES (?,?,?,?,?,?)
             """, (name, roll_no, subject_id, marks, attendance, session['user_id']))
             conn.commit()
@@ -218,7 +217,7 @@ def add():
 @admin_required
 def edit(id):
     conn = get_db()
-    student = conn.execute("SELECT * FROM students WHERE id=?", (id,)).fetchone()
+    student = conn.execute("SELECT * FROM student WHERE id=?", (id,)).fetchone()
     subjects = conn.execute("SELECT * FROM subjects").fetchall()
 
     if request.method == 'POST':
@@ -230,7 +229,7 @@ def edit(id):
 
         try:
             conn.execute("""
-                UPDATE students SET name=?, roll_no=?, subject_id=?, marks=?, attendance=?
+                UPDATE student SET name=?, roll_no=?, subject_id=?, marks=?, attendance=?
                 WHERE id=?
             """, (name, roll_no, subject_id, marks, attendance, id))
             conn.commit()
@@ -249,7 +248,7 @@ def edit(id):
 @admin_required
 def delete(id):
     conn = get_db()
-    conn.execute("DELETE FROM students WHERE id=?", (id,))
+    conn.execute("DELETE FROM student WHERE id=?", (id,))
     conn.commit()
     conn.close()
     flash('Student deleted successfully!', 'success')
@@ -261,7 +260,7 @@ def view(id):
     conn = get_db()
     student = conn.execute("""
         SELECT s.*, sub.subject_name, sub.subject_code, sub.teacher_name, u.username as created_by_name
-        FROM students s
+        FROM student s
         JOIN subjects sub ON s.subject_id = sub.id
         LEFT JOIN users u ON s.created_by = u.id
         WHERE s.id=?
@@ -277,7 +276,7 @@ def subjects():
         SELECT sub.*, COUNT(s.id) as student_count,
                AVG(s.marks) as avg_marks
         FROM subjects sub
-        LEFT JOIN students s ON sub.id = s.subject_id
+        LEFT JOIN student s ON sub.id = s.subject_id
         GROUP BY sub.id
     """).fetchall()
     conn.close()
@@ -338,7 +337,7 @@ def edit_subject(id):
 @admin_required
 def delete_subject(id):
     conn = get_db()
-    student_count = conn.execute("SELECT COUNT(*) FROM students WHERE subject_id=?", (id,)).fetchone()[0]
+    student_count = conn.execute("SELECT COUNT(*) FROM student WHERE subject_id=?", (id,)).fetchone()[0]
 
     if student_count > 0:
         flash('Cannot delete subject! Students are enrolled in this subject.', 'danger')
@@ -384,7 +383,7 @@ def export():
         SELECT s.roll_no, s.name, sub.subject_name, sub.subject_code,
                s.marks, s.attendance,
                CASE WHEN s.marks >= 40 THEN 'Pass' ELSE 'Fail' END as result
-        FROM students s
+        FROM student s
         JOIN subjects sub ON s.subject_id = sub.id
         ORDER BY s.roll_no
     """).fetchall()
@@ -410,4 +409,4 @@ with app.app_context():
     init_db()
 
 if __name__ == '__main__':
-    app.run() # debug=True hata diya
+    app.run()
