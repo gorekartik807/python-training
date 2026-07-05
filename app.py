@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
 import sqlite3
+import os
 from functools import wraps
 import csv
 import io
@@ -7,30 +8,36 @@ import io
 app = Flask(__name__)
 app.secret_key = 'studentms_secret_key_2026'
 
+# Database ka path instance folder me set kiya - PythonAnywhere ke liye best
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+DB_PATH = os.path.join(BASE_DIR, 'instance', 'student.db')
+
 def get_db():
-    conn = sqlite3.connect('student.db')
+    # instance folder nahi hai to auto bana dega
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
     conn = get_db()
-    conn.execute('''CREATE TABLE IF NOT EXISTS users 
-                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                     username TEXT UNIQUE, 
-                     password TEXT, 
+    conn.execute('''CREATE TABLE IF NOT EXISTS users
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                     username TEXT UNIQUE,
+                     password TEXT,
                      role TEXT)''')
-    conn.execute('''CREATE TABLE IF NOT EXISTS subjects 
-                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                     subject_name TEXT, 
-                     subject_code TEXT UNIQUE, 
+    conn.execute('''CREATE TABLE IF NOT EXISTS subjects
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                     subject_name TEXT,
+                     subject_code TEXT UNIQUE,
                      teacher_name TEXT)''')
-    conn.execute('''CREATE TABLE IF NOT EXISTS students 
-                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                     name TEXT, 
-                     roll_no TEXT UNIQUE, 
-                     subject_id INTEGER, 
-                     marks INTEGER, 
-                     attendance INTEGER, 
+    conn.execute('''CREATE TABLE IF NOT EXISTS students
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                     name TEXT,
+                     roll_no TEXT UNIQUE,
+                     subject_id INTEGER,
+                     marks INTEGER,
+                     attendance INTEGER,
                      created_by INTEGER,
                      FOREIGN KEY(subject_id) REFERENCES subjects(id),
                      FOREIGN KEY(created_by) REFERENCES users(id))''')
@@ -66,16 +73,16 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        
+
         # Auto role: admin username pe admin, baaki sab student
         if username.lower() == 'admin':
             role = 'admin'
         else:
             role = 'student'
-        
+
         conn = get_db()
         try:
-            conn.execute("INSERT INTO users (username, password, role) VALUES (?,?,?)", 
+            conn.execute("INSERT INTO users (username, password, role) VALUES (?,?,?)",
                         (username, password, role))
             conn.commit()
             flash('Registration successful! Please login.', 'success')
@@ -91,12 +98,12 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
+
         conn = get_db()
-        user = conn.execute("SELECT * FROM users WHERE username=? AND password=?", 
+        user = conn.execute("SELECT * FROM users WHERE username=? AND password=?",
                            (username, password)).fetchone()
         conn.close()
-        
+
         if user:
             session['user_id'] = user['id']
             session['username'] = user['username']
@@ -135,37 +142,37 @@ def records():
     subject_id = request.args.get('subject_id', '')
     status = request.args.get('status', '')
     attendance = request.args.get('attendance', '')
-    
+
     conn = get_db()
     subjects = conn.execute("SELECT * FROM subjects").fetchall()
-    
+
     query = """
-        SELECT s.*, sub.subject_name 
-        FROM students s 
-        JOIN subjects sub ON s.subject_id = sub.id 
+        SELECT s.*, sub.subject_name
+        FROM students s
+        JOIN subjects sub ON s.subject_id = sub.id
         WHERE 1=1
     """
     params = []
-    
+
     if search:
         query += " AND (s.name LIKE? OR s.roll_no LIKE? OR sub.subject_name LIKE?)"
         params.extend([f'%{search}%', f'%{search}%', f'%{search}%'])
-    
+
     if subject_id:
         query += " AND s.subject_id =?"
         params.append(subject_id)
-    
+
     if status == 'passed':
         query += " AND s.marks >= 40"
     elif status == 'failed':
         query += " AND s.marks < 40"
-    
+
     if attendance == 'low':
         query += " AND s.attendance < 75"
-    
+
     students = conn.execute(query, params).fetchall()
     conn.close()
-    
+
     filter_title = "All Students"
     if status == 'passed':
         filter_title = "Passed Students"
@@ -173,7 +180,7 @@ def records():
         filter_title = "Failed Students"
     if attendance == 'low':
         filter_title = "Students with Low Attendance"
-    
+
     return render_template('records.html', students=students, subjects=subjects, search=search, filter_title=filter_title)
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -182,14 +189,14 @@ def records():
 def add():
     conn = get_db()
     subjects = conn.execute("SELECT * FROM subjects").fetchall()
-    
+
     if request.method == 'POST':
         name = request.form['name']
         roll_no = request.form['roll_no']
         subject_id = request.form['subject_id']
         marks = request.form['marks']
         attendance = request.form['attendance']
-        
+
         try:
             conn.execute("""
                 INSERT INTO students (name, roll_no, subject_id, marks, attendance, created_by)
@@ -202,7 +209,7 @@ def add():
             flash('Roll number already exists!', 'danger')
         finally:
             conn.close()
-    
+
     conn.close()
     return render_template('add.html', subjects=subjects)
 
@@ -213,14 +220,14 @@ def edit(id):
     conn = get_db()
     student = conn.execute("SELECT * FROM students WHERE id=?", (id,)).fetchone()
     subjects = conn.execute("SELECT * FROM subjects").fetchall()
-    
+
     if request.method == 'POST':
         name = request.form['name']
         roll_no = request.form['roll_no']
         subject_id = request.form['subject_id']
         marks = request.form['marks']
         attendance = request.form['attendance']
-        
+
         try:
             conn.execute("""
                 UPDATE students SET name=?, roll_no=?, subject_id=?, marks=?, attendance=?
@@ -233,7 +240,7 @@ def edit(id):
             flash('Roll number already exists!', 'danger')
         finally:
             conn.close()
-    
+
     conn.close()
     return render_template('edit.html', student=student, subjects=subjects)
 
@@ -254,7 +261,7 @@ def view(id):
     conn = get_db()
     student = conn.execute("""
         SELECT s.*, sub.subject_name, sub.subject_code, sub.teacher_name, u.username as created_by_name
-        FROM students s 
+        FROM students s
         JOIN subjects sub ON s.subject_id = sub.id
         LEFT JOIN users u ON s.created_by = u.id
         WHERE s.id=?
@@ -267,7 +274,7 @@ def view(id):
 def subjects():
     conn = get_db()
     subjects = conn.execute("""
-        SELECT sub.*, COUNT(s.id) as student_count, 
+        SELECT sub.*, COUNT(s.id) as student_count,
                AVG(s.marks) as avg_marks
         FROM subjects sub
         LEFT JOIN students s ON sub.id = s.subject_id
@@ -284,7 +291,7 @@ def add_subject():
         subject_name = request.form['subject_name']
         subject_code = request.form['subject_code']
         teacher_name = request.form['teacher_name']
-        
+
         conn = get_db()
         try:
             conn.execute("INSERT INTO subjects (subject_name, subject_code, teacher_name) VALUES (?,?,?)",
@@ -304,12 +311,12 @@ def add_subject():
 def edit_subject(id):
     conn = get_db()
     subject = conn.execute("SELECT * FROM subjects WHERE id=?", (id,)).fetchone()
-    
+
     if request.method == 'POST':
         subject_name = request.form['subject_name']
         subject_code = request.form['subject_code']
         teacher_name = request.form['teacher_name']
-        
+
         try:
             conn.execute("""
                 UPDATE subjects SET subject_name=?, subject_code=?, teacher_name=?
@@ -322,7 +329,7 @@ def edit_subject(id):
             flash('Subject code already exists!', 'danger')
         finally:
             conn.close()
-    
+
     conn.close()
     return render_template('edit_subject.html', subject=subject)
 
@@ -332,14 +339,14 @@ def edit_subject(id):
 def delete_subject(id):
     conn = get_db()
     student_count = conn.execute("SELECT COUNT(*) FROM students WHERE subject_id=?", (id,)).fetchone()[0]
-    
+
     if student_count > 0:
         flash('Cannot delete subject! Students are enrolled in this subject.', 'danger')
     else:
         conn.execute("DELETE FROM subjects WHERE id=?", (id,))
         conn.commit()
         flash('Subject deleted successfully!', 'success')
-    
+
     conn.close()
     return redirect(url_for('subjects'))
 
@@ -350,10 +357,10 @@ def change_password():
         old_password = request.form['old_password']
         new_password = request.form['new_password']
         confirm_password = request.form['confirm_password']
-        
+
         conn = get_db()
         user = conn.execute("SELECT * FROM users WHERE id=?", (session['user_id'],)).fetchone()
-        
+
         if user['password']!= old_password:
             flash('Old password is incorrect!', 'danger')
         elif new_password!= confirm_password:
@@ -374,23 +381,23 @@ def change_password():
 def export():
     conn = get_db()
     students = conn.execute("""
-        SELECT s.roll_no, s.name, sub.subject_name, sub.subject_code, 
+        SELECT s.roll_no, s.name, sub.subject_name, sub.subject_code,
                s.marks, s.attendance,
                CASE WHEN s.marks >= 40 THEN 'Pass' ELSE 'Fail' END as result
-        FROM students s 
+        FROM students s
         JOIN subjects sub ON s.subject_id = sub.id
         ORDER BY s.roll_no
     """).fetchall()
     conn.close()
-    
+
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow(['Roll No', 'Name', 'Subject', 'Subject Code', 'Marks', 'Attendance %', 'Result'])
-    
+
     for student in students:
-        writer.writerow([student['roll_no'], student['name'], student['subject_name'], 
+        writer.writerow([student['roll_no'], student['name'], student['subject_name'],
                         student['subject_code'], student['marks'], student['attendance'], student['result']])
-    
+
     output.seek(0)
     return Response(
         output,
@@ -398,8 +405,9 @@ def export():
         headers={"Content-Disposition": "attachment;filename=students_report.csv"}
     )
 
-# PythonAnywhere ke liye - tables auto create karne ke liye
-init_db()
+# PythonAnywhere ke liye - app load hote hi DB ban jayegi
+with app.app_context():
+    init_db()
 
 if __name__ == '__main__':
     app.run(debug=True)
