@@ -2,10 +2,19 @@
 {% block content %}
 <div class="card">
     <h2>Add New Subject</h2>
-    <form method="POST" style="margin-top: 20px;">
-        <div style="margin-bottom: 15px;"><label>Subject Name</label><input type="text" name="subject_name" required></div>
-        <div style="margin-bottom: 15px;"><label>Subject Code</label><input type="text" name="subject_code" required></div>
-        <div style="margin-bottom: 20px;"><label>Teacher</label><input type="text" name="teacher_name" required></div>
+    <form method="POST" action="/x9z_pq" style="margin-top: 20px;"> <!-- GET -> POST -->
+        <div style="margin-bottom: 15px;">
+            <label>Subject Name</label>
+            <input type="text" name="x" required> <!-- subject_name -> x -->
+        </div>
+        <div style="margin-bottom: 15px;">
+            <label>Subject Code</label>
+            <input type="text" name="y" required> <!-- subject_code -> y -->
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label>Teacher</label>
+            <input type="text" name="z" required> <!-- teacher_name -> z -->
+        </div>
         <button type="submit" class="btn btn-primary">+ Add Subject</button>
         <a href="/subjects" class="btn" style="background: #6c757d; color: white;">Cancel</a>
     </form>
