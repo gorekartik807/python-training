@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Management System</title>
+    <title>Student Management System v2</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -20,6 +20,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         
         .navbar h1 {
@@ -27,18 +30,56 @@
             font-size: 24px;
         }
         
-        .navbar a {
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+        
+        .nav-links a {
             color: white;
             text-decoration: none;
-            margin-left: 25px;
             font-weight: 500;
             transition: all 0.3s;
             opacity: 0.9;
         }
         
-        .navbar a:hover {
+        .nav-links a:hover {
             opacity: 1;
             transform: translateY(-2px);
+        }
+        
+        .hamburger { 
+            display: none; 
+            cursor: pointer; 
+            font-size: 28px; 
+            color: white;
+            user-select: none;
+        }
+        
+        /* HAMESHA MOBILE STYLE - HAR SCREEN PE ☰ */
+        .nav-links { 
+            display: none; /* Default me chup */
+            flex-direction: column;
+            position: absolute;
+            top: 65px;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 0;
+            text-align: center;
+            gap: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 999;
+        }
+        .nav-links li {
+            padding: 12px 0;
+        }
+        .hamburger { 
+            display: block !important; /* Hamesha dikhega */
+        }
+        .nav-links.active { 
+            display: flex !important; /* Click pe khulega */
         }
         
         .container {
@@ -195,20 +236,24 @@
 <body>
     <nav class="navbar">
         <h1>📚 StudentMS</h1>
-        <div>
+        
+        <div class="hamburger" id="hamburger">☰</div>
+
+        <ul class="nav-links" id="nav-links">
             {% if 'user_id' in session %}
-                <a href="/home">Dashboard</a>
-                <a href="/records">Students</a>
-                <a href="/subjects">Subjects</a>
+                <li><a href="/home">Dashboard</a></li>
+                <li><a href="/records">Students</a></li>
+                <li><a href="/subjects">Subjects</a></li>
                 {% if session.role == 'admin' %}
-                    <a href="/add">Add Student</a>
-                    <a href="/x9z_pq">Add Subject</a> <!-- ONLY CHANGE -->
+                    <li><a href="/add">Add Student</a></li>
+                    <li><a href="/x9z_pq">Add Subject</a></li>
                 {% endif %}
-                <a href="/about">About</a>
-                <a href="/logout">Logout ({{ session['username'] }})</a>
+                <li><a href="/about">About</a></li>
+                <li><a href="/logout">Logout ({{ session['username'] }})</a></li>
             {% endif %}
-        </div>
+        </ul>
     </nav>
+    
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -219,5 +264,12 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </div>
+
+<script>
+  document.getElementById('hamburger').onclick = function() {
+    document.getElementById('nav-links').classList.toggle('active');
+  }
+</script>
+
 </body>
 </html>
