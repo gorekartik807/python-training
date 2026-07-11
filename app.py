@@ -4,9 +4,12 @@ import os
 from functools import wraps
 import csv
 import io
+from groq import Groq # NEW
 
 app = Flask(__name__)
 app.secret_key = 'studentms_secret_key_2026'
+
+client = Groq(api_key=os.environ.get("gsk_aNib9j2HeftaEMjojYtPWGdyb3FYfdNftKXoV8tT0LubLmf3R")) # NEW
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'instance', 'student.db')
@@ -332,6 +335,33 @@ def export():
         writer.writerow([student['roll_no'], student['name'], student['subject_name'], student['subject_code'], student['marks'], student['attendance'], student['result']])
     output.seek(0)
     return Response(output, mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=students_report.csv"})
+
+# NEW: AI TIP ROUTE
+@app.route('/get_ai_tip', methods=['POST'])
+@login_required
+def get_ai_tip():
+    student_id = request.form.get('student_id')
+    conn = get_db()
+    student = conn.execute("SELECT s.*, sub.subject_name FROM student s JOIN subjects sub ON s.subject_id = sub.id WHERE s.id=?", (student_id,)).fetchone()
+    conn.close()
+
+    if not student:
+        flash('Student not found', 'danger')
+        return redirect(url_for('records'))
+
+    prompt = f"Student {student['name']} got {student['marks']} marks in {student['subject_name']} with {student['attendance']}% attendance. Give 2 short practical tips to improve."
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        tip = response.choices[0].message.content
+        flash(f"🤖 AI Tip for {student['name']}: {tip}", "info")
+    except Exception as e:
+        flash(f"AI Error: {str(e)}", "danger")
+
+    return redirect(url_for('view', id=student_id))
 
 with app.app_context():
     init_db()

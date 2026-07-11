@@ -38,6 +38,13 @@
             </td>
         </tr>
     </table>
+    
+    <!-- NEW: Get AI Tip Button -->
+    <form action="{{ url_for('get_ai_tip') }}" method="POST" style="margin-top: 15px;">
+        <input type="hidden" name="student_id" value="{{ student.id }}">
+        <button type="submit" class="btn btn-info">Get AI Tip</button>
+    </form>
+
     <div style="margin-top: 25px;">
         <a href="/records" class="btn btn-primary">← Back to Records</a>
         {% if session.role == 'admin' %}
