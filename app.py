@@ -351,7 +351,7 @@ def get_ai_tip():
         flash('Student not found', 'danger')
         return redirect(url_for('records'))
 
-    prompt = f"Student {student['name']} got {student['marks']} marks in {student['subject_name']} with {student['attendance']}% attendance. Give 2 short practical tips in Hindi to improve. Max 2 lines."
+    prompt = f"Student {student['name']} got {student['marks']} marks in {student['subject_name']} with {student['attendance']}% attendance. Give 2 short practical tips in English to improve. Max 2 lines."
 
     try:
         response = client.chat.completions.create(
