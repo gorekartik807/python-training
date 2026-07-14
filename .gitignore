@@ -18,3 +18,4 @@ venv/
 
 # VSCode settings
 .vscode/
+.env
