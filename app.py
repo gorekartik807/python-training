@@ -4,12 +4,14 @@ import os
 from functools import wraps
 import csv
 import io
-from groq import Groq # NEW
+from groq import Groq
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.secret_key = 'studentms_secret_key_2026'
 
-client = Groq(api_key=os.environ.get("gsk_aNib9j2HeftaEMjojYtPWGdyb3FYfdNftKXoV8tT0LubLmf3R")) # NEW
+load_dotenv() #.env file ko load karega
+client = Groq(api_key=os.environ.get("GROQ_API_KEY")) # Key.env se aa rahi hai
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'instance', 'student.db')
@@ -349,7 +351,7 @@ def get_ai_tip():
         flash('Student not found', 'danger')
         return redirect(url_for('records'))
 
-    prompt = f"Student {student['name']} got {student['marks']} marks in {student['subject_name']} with {student['attendance']}% attendance. Give 2 short practical tips to improve."
+    prompt = f"Student {student['name']} got {student['marks']} marks in {student['subject_name']} with {student['attendance']}% attendance. Give 2 short practical tips in Hindi to improve. Max 2 lines."
 
     try:
         response = client.chat.completions.create(
